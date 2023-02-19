@@ -1,0 +1,7 @@
+/* repeat for each theme and differentiate with attribute selector */
+:root 
+{
+    --color-primary: blue;
+    --color-bg: aliceblue;
+}
+

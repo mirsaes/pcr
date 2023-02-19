@@ -1,0 +1,127 @@
+@import url("../pallete.css");
+
+/* 
+requires body element to have overflow hidden 
+for scroll bars to not show..
+*/
+.detail-image-page
+{
+    display: flex;
+    padding: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+    flex: 1;
+    overflow-y:hidden;
+    overflow-x: hidden;
+    border-width: 0;
+
+}
+.detail-item-content 
+{
+    padding: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+.detailImageContainer {
+    position: relative;
+    display: flex;
+    flex: 1;
+    /*
+    overflow-y: scroll;
+    width: 100%;
+    */
+}
+.fitImageContainer {
+    position:relative;
+    display:flex;
+    flex: 1;
+}
+
+.fitImageHolder {
+    flex: 1;
+}
+
+img.fitImage {
+    object-fit: contain;
+    max-width: 100%;
+}
+
+.detailImage 
+{
+    object-fit: contain;
+    max-width: 100%;
+}
+
+.detailImageHUD 
+{
+    position:absolute;
+    top:0px;
+    background-color:white; 
+    opacity:0.5    
+}
+
+.itemViewMetaDataHUD
+{
+    position: absolute;
+    right: 12pt;
+    padding-right: 12pt;
+    padding-left: 12pt;
+    opacity: 0.5;
+    background-color: white;
+}
+
+#itemViewTagsList
+{
+    list-style-type: none;
+    padding-inline-start: 0px;
+
+}
+#itemViewTagsList header
+{
+    text-align: center;
+}
+
+.tag-delete
+{
+    margin-left: 6pt;
+}
+
+.detailImageRating
+{
+    display: flex;
+    flex-grow: 0;
+    user-select: none;
+}
+
+#ratingPopup {
+    display: flex;
+}
+/*a.active-rating::after*/
+.active-rating
+{
+    color: yellow;
+}
+
+a.hud-imageRating.active-rating::after
+{
+    background-color: yellow;
+}
+
+.navbar-horizontal a {
+    margin-left: 4pt;
+}
+
+.navbar-horizontal a.deleteItem {
+    position: absolute;
+    right: 6pt;
+}
+
+.swipe-area
+{
+    flex: 0.7;
+    border-width: 2px;
+    border-style: solid;
+    border-color: black;
+    text-align: center;
+    user-select: none;
+}

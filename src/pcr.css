@@ -1,0 +1,126 @@
+
+
+@import url("pallete.css");
+
+body.my-app
+{
+    margin: 0px;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+div#pcr
+{
+    width: 100vw;
+    min-height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-title
+{
+    text-align: center;
+}
+
+
+ul.mylist
+{
+list-style-type: none;
+padding: 0;
+margin: 0;
+/*overflow-y: scroll;*/
+}
+ul.mylist > li
+{
+    background-color: lightblue;
+    color: white;
+}
+
+ul.mylist > li > a
+{
+    width: 100%;
+}
+
+ul.mylist > li > a > div
+{
+    color: black;
+}
+header.myheader
+{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+header.myfooter 
+{
+    align-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    top: auto;
+    bottom: -1px;
+    padding-bottom: 1px;
+    position: fixed;
+}
+header.myfooter.placeholder
+{
+    position: unset;
+    padding-bottom: 0px;
+}
+header.myfooter > button > svg
+{
+    color: white;
+}
+header.myfooter > button > a
+{
+    color: white;
+}
+header.myfooter > div
+{
+    display: flex;
+    align-items: center;
+}
+div.page-body
+{
+    flex: 1;
+    background-color:var(--color-bg);
+}
+
+.MuiBackdrop-root
+{
+    background-color: rgb(199, 216, 231)!;
+    border-style: solid;
+    border-color: black;
+    border-width: thick;
+}
+
+/* repos list */
+.item-label
+{
+    display:flex;
+    align-items:center;
+}
+
+div.item-thumb
+{
+    width: 80pt;
+    max-height: 80pt;
+    margin-right: 10pt;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+img.item-thumb
+{
+    max-width: 80pt;
+    max-height: 80pt;
+}
+
+.repo-item
+{
+    display: flex;
+}
