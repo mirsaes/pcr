@@ -21,50 +21,64 @@ import { gServers, gServers as serverstore } from './ServerDataSource';
 
 // load servers before configuring routes so that a refresh on a repo will have servers loaded
 //await gServers.loadServers();
-const appBasename = ((path) => path.substring(0, path.lastIndexOf('/')))(window.location.pathname);
-console.log(appBasename);
+// to make mounting under some other non-root path, need to allow for a base name
 
-const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <Root />,
-		loader: serverLoader,
-		//action: serverAddAction
-		errorElement: <ErrorPage/>
-	},
-	{
-		path: "/settings",
-		element: <Settings/>,
-		loader: settingsServerLoader,
-	},
-	{
-		path: "/:serverId/repos",
-		element: <Repos/>,
-		loader: reposLoader,
-	},
-	{
-		path: "/:serverId/repo",
-		element: <Repo />,
-		loader: repoLoader,
-	},
-	{
-		path: "/:serverId/items",
-		element: <Items />,
-		loader: itemsLoader,
-	},
-	{
-		path: "/:serverId/itemView",
-		element: <ItemView/>,
-		loader: itemViewLoader,
-	},
-	{
-		path: "/:serverId/itemEdit",
-		element: <ItemEdit/>,
-		loader: itemEditLoader
+const appBasename2 = ((path) => path.substring(0, path.lastIndexOf('/')))(window.location.pathname);
+let appBasename: string|undefined=undefined;
+const pcrElem = document.getElementById("pcr")
+if (pcrElem) {
+	const appmount = pcrElem.getAttribute("appmount");
+	if  (appmount) {
+		appBasename = appmount;
 	}
-], {basename: appBasename});
+}
+
+console.log(`appBasename2=${appBasename2}`);
+console.log(`appBasename=${appBasename}`);
 
 gServers.loadServers().then( () => {
+
+	const router = createBrowserRouter([
+		{
+			path: "/",
+			element: <Root />,
+			loader: serverLoader,
+			//action: serverAddAction
+			errorElement: <ErrorPage/>
+		},
+		{
+			path: "/settings",
+			element: <Settings/>,
+			loader: settingsServerLoader,
+		},
+		{
+			path: "/:serverId/repos",
+			element: <Repos/>,
+			loader: reposLoader,
+		},
+		{
+			path: "/:serverId/repo",
+			element: <Repo />,
+			loader: repoLoader,
+		},
+		{
+			path: "/:serverId/items",
+			element: <Items />,
+			loader: itemsLoader,
+		},
+		{
+			path: "/:serverId/itemView",
+			element: <ItemView/>,
+			loader: itemViewLoader,
+		},
+		{
+			path: "/:serverId/itemEdit",
+			element: <ItemEdit/>,
+			loader: itemEditLoader
+		}
+	], {basename: appBasename});
+	
+
 	ReactDOM.createRoot(document.getElementById("pcr")!).render(
 		<React.StrictMode>
 			<RouterProvider router={router}/>

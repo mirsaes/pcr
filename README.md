@@ -38,6 +38,7 @@ To serve multiple repositories, either run multiple instances of mirsaes/phototi
 # Known Issues
 * 2023.02.18
   * After delete, navigation still shows in parent
+  * navigating "back/up" history is not replaced with proper parent of current item being viewed
 * 2021.09.05
   * After crop, new file is not visible until refresh
 

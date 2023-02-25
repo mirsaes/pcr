@@ -13,6 +13,9 @@ interface DirectionContext {
 }
 
 
+/**
+ *  A depth first tree navigator, needs refactoring and formalizing
+ */
 export class ItemViewNavigator
 {
 	updateViewForNewItem: () => void;
@@ -36,6 +39,7 @@ export class ItemViewNavigator
 
 	processNextOrPrevFinding = async (adjNav: NavInfo, applocation: AppLocation, directionContext: DirectionContext) => {
 		if (adjNav.item && adjNav.popCount == 0) {
+			// "next" available
 			if (adjNav.item.type == 'file') {
 				console.warn('Does this work?');
 			} else {
@@ -44,13 +48,12 @@ export class ItemViewNavigator
 				if (!adjNav.item.items) {
 					// ajax to get items, then proceed
 					let loadedItem = await this.fetchItems(adjNav.item.id);
-					//let loadedItem = await gConx.getItems(adjNav.item.id);
 					if (adjNav.item.id == loadedItem.info.id) {
 						adjNav.item.items = loadedItem.items;
 					}
 				}
 				if (!adjNav.item.items) {
-					throw "folder has not items created";
+					throw "folder has no items created?";
 				}
 
 				if (adjNav.item.items.length == 0) {
@@ -66,6 +69,7 @@ export class ItemViewNavigator
 			}
 		}
 		else if (adjNav.ancestorSibling && adjNav.popCount > 0) {
+			// "next" sibling of some parent
 			if (adjNav.item) {
 				if (adjNav.item.type == 'file') {
 					// set next item (should be file)
@@ -99,38 +103,33 @@ export class ItemViewNavigator
 				var gConx = photoTimeAPI.getConnection();
 				if (!gConx) throw "unable to get connection";
 
-				gConx.getItems(adjNav.ancestorSibling.id).then( (loadedItem) => {
-					var jData = loadedItem;
-					// next could either be in a sibling folder
-					// or have to use its parent folder..
+				let loadedItem = await gConx.getItems(adjNav.ancestorSibling.id);
 
+				var jData = loadedItem;
+				// next could either be in a sibling folder
+				// or have to use its parent folder..
 
-					// if jData.items.length == 0, this is empty folder
-					// so ... continue searching? unless last item?
-					if (jData.items.length == 0) {
-						for (let popIdx=0; popIdx < adjNav.popCount; ++popIdx) {
-							applocation.parents.pop();
-						}
-
-						const emptyFolderItem: NavItem = {type:"folder", ... jData.info};
-						emptyFolderItem.items=jData.items;
-						// update navstate, but then continue searching..
-						//directionContext.updateNavFn(adjNav, )
-						// todo should update parents, item info so it has empty items, items=[];							
-						applocation.item = emptyFolderItem;
-						// don't need to pop parents state, have already done that
-						let emptyFolderAdjNav = directionContext.getNextOrPrev(emptyFolderItem);
-						this.processNextOrPrevFinding(emptyFolderAdjNav, applocation, directionContext);
-
-					} else {
-						directionContext.updateNavFn(adjNav, jData.items);
-						// turn off loading
-						this.updateViewForNewItem();
+				// if jData.items.length == 0, this is empty folder
+				// so ... continue searching? unless last item?
+				if (jData.items.length == 0) {
+					for (let popIdx=0; popIdx < adjNav.popCount; ++popIdx) {
+						applocation.parents.pop();
 					}
-				}, (reason) => {
-					console.warn('failed');
-					console.warn(reason);
-				});
+
+					const emptyFolderItem: NavItem = {type:"folder", ... jData.info};
+					emptyFolderItem.items=jData.items;
+					// update navstate, but then continue searching..
+					//directionContext.updateNavFn(adjNav, )
+					// todo should update parents, item info so it has empty items, items=[];							
+					applocation.item = emptyFolderItem;
+					// don't need to pop parents state, have already done that
+					let emptyFolderAdjNav = directionContext.getNextOrPrev(emptyFolderItem);
+					this.processNextOrPrevFinding(emptyFolderAdjNav, applocation, directionContext);
+				} else {
+					directionContext.updateNavFn(adjNav, jData.items);
+					// turn off loading
+					this.updateViewForNewItem();
+				}
 			} else {
 				directionContext.updateNavFn(adjNav, adjNav.ancestorSibling.items);
 				// turn off loading
@@ -142,59 +141,50 @@ export class ItemViewNavigator
 		const applocation = appstate.getLocation();
 
 		if (directionContext.siblingItem) {
+			// have a sibling (file or folder)
 			if (directionContext.siblingItem.type == 'file') {
 				applocation.setItem(directionContext.siblingItem);
 				this.updateViewForNewItem();
 			} else {
 				// its a folder
-				if (directionContext.siblingItem.items) {
-					// items loaded, so
-					applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
-					applocation.parents.push(directionContext.siblingItem);
-					this.updateViewForNewItem();
-				} else {
+				if (!directionContext.siblingItem.items) {
 					// items not loaded so need to load
 					console.debug('navigating and items not loaded so need to load');
 					var gConx = photoTimeAPI.getConnection();
 					if (!gConx) throw "unable to get connection";
 
-					gConx.getItems(directionContext.siblingItem.id).then((loadedItem) => {
-						var jData = loadedItem;
-						if (jData.items && jData.items.length) {
-							// items now loaded, so...
-							//applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
-							//applocation.parents.push(directionContext.siblingItem);
+					let loadedItem = await gConx.getItems(directionContext.siblingItem.id);
+					var jData = loadedItem;
 
-							directionContext.siblingItem.items = jData.items;
-							if (!directionContext.siblingItem.items) {
-								throw "no items - won't happen";
-							}
+					if (jData.items && jData.items.length) {
+						// items now loaded, so...
+						directionContext.siblingItem.items = jData.items;
+					}
+				}
 
-							applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
-							applocation.parents.push(directionContext.siblingItem);
-							this.updateViewForNewItem();
-			
-							//itemViewPage.updateToPrev(adjNav, jData.items);
-						} else {
-							// just show it as an item
-							applocation.item = directionContext.siblingItem;
-							this.updateViewForNewItem();
-						}
-					}, (reason) => {
-						console.warn('failed');
-						console.warn(reason);
-					});
+				if (directionContext.siblingItem.items) {
+					// items already (or now) loaded, so
+					applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
+					applocation.parents.push(directionContext.siblingItem);
+					this.updateViewForNewItem();
+				} else {
+					// just show it as an item
+					applocation.item = directionContext.siblingItem;
+					this.updateViewForNewItem();
 				}
 			}
+
 			return;
 		}
 
 		// no more siblings, try to go to parent's sibling's next item
-		// the parent's sibling might be "empty", so repeat?, nah, show empty folder..
+		// the parent's sibling might be "empty", so repeat as needed
 		//if no applocation.item.., that means empty folder and trying to go next
 		if (!applocation.item) {
 			// parent is the folder being examined, so go up and to next sibling
 			// if no next sibling, repeat up and to next sibling
+			console.log(`test fixme, go to parent's "next" sibling`);
+			console.log(applocation);
 		}
 		if (applocation.item) {
 			var adjNav = directionContext.getNextOrPrev(applocation.item);
